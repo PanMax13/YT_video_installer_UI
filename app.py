@@ -6,7 +6,7 @@ import asyncio
 from installer import install_data
 
 from PyQt6.QtWidgets import QWidget, QApplication, QFormLayout, \
-    QLabel, QLineEdit, QPushButton
+    QLabel, QLineEdit, QPushButton, QFileDialog
 
 
 class Window(QWidget):
@@ -22,28 +22,38 @@ class Window(QWidget):
         self.fileName = QLineEdit()
         self.fileName.setText("Enter your file name")
 
-        doneButton = QPushButton(text="Done!")
+        download_video_button = QPushButton(text="Download video")
+        download_audio_button = QPushButton(text="Download audio")
 
         self.message = QLabel("")
 
-        doneButton.clicked.connect(self.button_clicked)
+        download_audio_button.clicked.connect(self.audio_button_clicked)
+        download_video_button.clicked.connect(self.video_button_clicked)
 
-
+        self.path = QFileDialog.getExistingDirectory(
+            caption='Select a path to install',
+            directory='./'
+        )
 
         layout = QFormLayout()
         layout.addRow(self.inputLinkLine)
         layout.addRow(self.fileName)
-        layout.addRow(doneButton)
+        layout.addRow(download_audio_button, download_video_button)
         layout.addRow(self.message)
 
         self.setLayout(layout)
 
-    def button_clicked(self):
+    def video_button_clicked(self):
         link = self.inputLinkLine.text()
         name = self.fileName.text()
 
-        self.message.setText(asyncio.run(install_data(link, name)))
+        self.message.setText(asyncio.run(install_data(link, name, 'video', path=self.path)))
 
+    def audio_button_clicked(self):
+        link = self.inputLinkLine.text()
+        name = self.fileName.text()
+
+        self.message.setText(asyncio.run(install_data(link, name, 'audio', path=self.path)))
 
 
 app = QApplication([])
